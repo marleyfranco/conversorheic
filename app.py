@@ -409,6 +409,43 @@ class ConversorApp(ctk.CTk):
             messagebox.showinfo("Pronto", f"{ok} arquivo(s) convertido(s) com sucesso!")
 
 
+def autoteste():
+    """Verifica se o programa empacotado funciona (usado no build automático).
+
+    Abre a janela, lê o vídeo de abertura e converte uma imagem HEIC gerada na
+    hora. Retorna 0 se tudo deu certo; em caso de falha grava autoteste.log.
+    """
+    import tempfile
+    import traceback
+
+    try:
+        import av
+        import pillow_heif
+
+        for nome in ("intro.mp4", "logo.png", "icon.ico"):
+            if not recurso(nome).exists():
+                raise FileNotFoundError(recurso(nome))
+        with av.open(str(recurso("intro.mp4"))) as video:
+            next(video.decode(video=0))
+
+        with tempfile.TemporaryDirectory() as pasta:
+            origem = Path(pasta) / "teste.heic"
+            pillow_heif.from_pillow(Image.new("RGB", (32, 32), "blue")).save(origem)
+            gerados = converter(origem, ["PNG", "JPG"])
+            if len(gerados) != 2 or not all(g.exists() for g in gerados):
+                raise RuntimeError(f"Conversão incompleta: {gerados}")
+
+        app = ConversorApp(abertura=False)
+        app.update()
+        app.destroy()
+        return 0
+    except Exception:  # noqa: BLE001 - qualquer falha reprova o teste
+        Path("autoteste.log").write_text(traceback.format_exc(), encoding="utf-8")
+        return 1
+
+
 if __name__ == "__main__":
     ctk.set_appearance_mode("dark")
+    if "--autoteste" in sys.argv:
+        sys.exit(autoteste())
     ConversorApp(abertura="--sem-abertura" not in sys.argv).mainloop()

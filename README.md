@@ -51,16 +51,43 @@ from conversor import converter
 converter("IMG_0001.HEIC", ["PNG", "JPG"], pasta_saida="convertidas", qualidade=85)
 ```
 
-## Gerar um executável (opcional)
+## Instalar no Windows (sem Python)
+
+Baixe o instalador na página **Releases** do repositório (ou em **Actions** →
+último build → *Artifacts*) e execute `ConversorHEIC-Setup-<versão>.exe`.
+Ele não pede permissão de administrador, cria atalho no Menu Iniciar (e, se
+quiser, na Área de Trabalho) e aparece em "Adicionar ou remover programas".
+
+Também é gerada uma versão portátil (`ConversorHEIC-Portatil-<versão>.zip`):
+basta descompactar e abrir `ConversorHEIC.exe`.
+
+> Como o executável não é assinado digitalmente, o Windows SmartScreen pode
+> avisar "O Windows protegeu o computador". Clique em **Mais informações** →
+> **Executar assim mesmo**.
+
+### Como os instaladores são gerados
+
+O GitHub Actions (`.github/workflows/build-windows.yml`) monta o programa numa
+máquina Windows a cada push, testa o executável (`--autoteste`) e guarda os
+arquivos em *Artifacts*. Para publicar uma versão oficial em **Releases**,
+crie uma tag:
 
 ```bash
-pip install pyinstaller
-pyinstaller --onefile --windowed --name ConversorHEIC --icon assets/icon.ico ^
-  --add-data "assets;assets" --collect-all pillow_heif --collect-all customtkinter --collect-all av app.py
+git tag v1.0.0
+git push origin v1.0.0
 ```
 
-No Linux/macOS troque `^` por `\` e `assets;assets` por `assets:assets`.
-O executável ficará em `dist/`.
+### Gerar no seu próprio Windows
+
+Com Python 3.10+ instalado (e, para o instalador, o
+[Inno Setup 6](https://jrsoftware.org/isdl.php)):
+
+```bat
+build_windows.bat 1.0.0
+```
+
+Resultado: `dist\ConversorHEIC\ConversorHEIC.exe` e
+`dist\ConversorHEIC-Setup-1.0.0.exe`.
 
 ## Estrutura
 
@@ -70,3 +97,5 @@ O executável ficará em `dist/`.
 | `abertura.py` | Tela de abertura com o vídeo da marca |
 | `conversor.py` | Conversão HEIC → PNG/JPG (pode ser usada sem interface) |
 | `assets/` | Vídeo de abertura, logo e ícone |
+| `build_windows.bat` | Gera o executável e o instalador no Windows |
+| `installer/ConversorHEIC.iss` | Script do instalador (Inno Setup) |
