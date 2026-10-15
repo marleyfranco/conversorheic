@@ -1,10 +1,12 @@
-# Conversor HEIC → PNG / JPG
+# Conversor HEIC → PNG / JPG · DUOMO Soluções
 
-Ferramenta com interface gráfica (Tkinter) para converter fotos `.heic` / `.heif`
-(padrão do iPhone) em `.png` e/ou `.jpg`.
+Ferramenta com interface gráfica moderna (CustomTkinter, tema escuro com as
+cores da DUOMO Soluções) para converter fotos `.heic` / `.heif` (padrão do
+iPhone) em `.png` e/ou `.jpg`. Ao abrir, exibe o vídeo de abertura da marca.
 
 ## Recursos
 
+- Vídeo de abertura da marca (clique ou `Esc` para pular)
 - Seleção de vários arquivos ou de uma pasta inteira (com opção de incluir subpastas)
 - Conversão para PNG, JPG ou ambos de uma vez
 - Ajuste de qualidade do JPG (10–100)
@@ -12,7 +14,8 @@ Ferramenta com interface gráfica (Tkinter) para converter fotos `.heic` / `.hei
 - Imagens com transparência recebem fundo branco ao virar JPG
 - Salva na mesma pasta do original ou em outra pasta escolhida
 - Não sobrescreve arquivos existentes (cria `foto_1.jpg`), a menos que você marque a opção
-- Barra de progresso; a conversão roda em segundo plano, sem travar a janela
+- Status por arquivo (pronto / erro) e barra de progresso; a conversão roda em
+  segundo plano, sem travar a janela
 
 ## Instalação
 
@@ -30,8 +33,12 @@ pip install -r requirements.txt
 ## Uso
 
 ```bash
-python app.py
+python app.py                 # com vídeo de abertura
+python app.py --sem-abertura  # abre direto na janela principal
 ```
+
+O som da abertura usa `sounddevice`. No Linux ele precisa da PortAudio
+(`sudo apt install libportaudio2`); sem ela a abertura roda sem som.
 
 1. Clique em **Adicionar arquivos...** ou **Adicionar pasta...**
 2. Marque **PNG** e/ou **JPG** e ajuste as opções
@@ -48,7 +55,18 @@ converter("IMG_0001.HEIC", ["PNG", "JPG"], pasta_saida="convertidas", qualidade=
 
 ```bash
 pip install pyinstaller
-pyinstaller --onefile --windowed --name ConversorHEIC --collect-all pillow_heif app.py
+pyinstaller --onefile --windowed --name ConversorHEIC --icon assets/icon.ico ^
+  --add-data "assets;assets" --collect-all pillow_heif --collect-all customtkinter --collect-all av app.py
 ```
 
+No Linux/macOS troque `^` por `\` e `assets;assets` por `assets:assets`.
 O executável ficará em `dist/`.
+
+## Estrutura
+
+| Arquivo | Função |
+| --- | --- |
+| `app.py` | Janela principal |
+| `abertura.py` | Tela de abertura com o vídeo da marca |
+| `conversor.py` | Conversão HEIC → PNG/JPG (pode ser usada sem interface) |
+| `assets/` | Vídeo de abertura, logo e ícone |

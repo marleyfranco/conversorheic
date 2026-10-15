@@ -1,2 +1,6 @@
 Pillow>=10.0
 pillow-heif>=0.16
+customtkinter>=5.2
+av>=12.0          # vídeo de abertura
+numpy>=1.24       # áudio da abertura
+sounddevice>=0.4  # áudio da abertura (opcional: sem ele a abertura fica muda)
